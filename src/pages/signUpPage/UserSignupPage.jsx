@@ -140,7 +140,7 @@ export const UserSignupPage = () => {
               color="primary"
               disabled={
                 values.pendingApiCall ||
-                values.errors.passwordRepeat !== undefined
+                values.errors.passwordRepeat 
               }
             >
               {values.pendingApiCall && (
