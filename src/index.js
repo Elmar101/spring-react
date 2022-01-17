@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import App from './container/App';
 import reportWebVitals from './reportWebVitals';
 import './bootstrap-override.scss';
-
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+import "./i18Nnitalizer/i18n";
 ReactDOM.render(
   <React.StrictMode>
     <App />

@@ -13,7 +13,7 @@ const XInputPassword = (props) => {
     console.log(error)
     return (
         
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="standard" error = {error ? true : false}>
+        <FormControl sx={{ m: 1, width: "100%" }} variant="standard" error = {error ? true : false}>
           <InputLabel htmlFor="standard-adornment-password">
             {label}
           </InputLabel>

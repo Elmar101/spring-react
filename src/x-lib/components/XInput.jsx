@@ -9,7 +9,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 const XInput = (props) => {
     const { value, error, label, onChange } = props;
     return (  
-        <FormControl sx={{ m: 1, width: "25ch" }} variant="standard" error = {error ? true : false}>
+        <FormControl sx={{ m: 1, width: "100%" }} variant="standard" error = {error ? true : false}>
             <InputLabel htmlFor="input-with-icon-adornment"> { label } </InputLabel>
             <Input id="input-with-icon-adornment"
                 value={value}

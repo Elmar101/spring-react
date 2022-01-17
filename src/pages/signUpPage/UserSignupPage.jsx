@@ -1,18 +1,21 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import XInput from "../../x-lib/components/XInput";
 import XInputPassword from "../../x-lib/components/XInputPassword";
 import { signUp } from "../../api/apiCalls";
-
-export const UserSignupPage = () => {
-  const [values, setValues] = React.useState({
+import { useTranslation } from "react-i18next";
+import LanguageSelector from "../../components/LanguageSelector";
+import { XButton } from "../../x-lib/components/XButton";
+import {withApiProgress} from "../../shared/ApiProgress";
+const UserSignupPage = (props) => {
+  const {pendingApiCall} = props;
+  const { t } = useTranslation();
+  const [state, setstate] = React.useState({
     username: "",
     displayname: "",
     password: "",
     passwordRepeat: "",
-    pendingApiCall: false,
     showPassword: false,
     errors: {
       username: "",
@@ -25,37 +28,37 @@ export const UserSignupPage = () => {
   const handleChange = (prop) => (event) => {
     let { value } = event.target;
     if (prop === "password" || prop === "passwordRepeat") {
-      if (prop === "password" && value !== values.passwordRepeat) {
-        setValues({
-          ...values,
+      if (prop === "password" && value !== state.passwordRepeat) {
+        setstate({
+          ...state,
           [prop]: value,
-          errors: { ...values.errors, passwordRepeat: "Password mismatch" },
+          errors: { ...state.errors, passwordRepeat: t("Password mismatch") },
         });
-      } else if (prop === "passwordRepeat" && value !== values.password) {
-        setValues({
-          ...values,
+      } else if (prop === "passwordRepeat" && value !== state.password) {
+        setstate({
+          ...state,
           [prop]: value,
-          errors: { ...values.errors, passwordRepeat: "Password mismatch" },
+          errors: { ...state.errors, passwordRepeat: t("Password mismatch") },
         });
       } else {
-        setValues({
-          ...values,
+        setstate({
+          ...state,
           [prop]: value,
-          errors: { ...values.errors, passwordRepeat: undefined },
+          errors: { ...state.errors, passwordRepeat: undefined },
         });
       }
     } else
-      setValues({
-        ...values,
+      setstate({
+        ...state,
         [prop]: value,
-        errors: { ...values.errors, [prop]: undefined },
+        errors: { ...state.errors, [prop]: undefined },
       });
   };
 
   const handleClickShowPassword = (prop) => () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
+    setstate({
+      ...state,
+      showPassword: !state.showPassword,
     });
   };
 
@@ -65,21 +68,17 @@ export const UserSignupPage = () => {
 
   const onSignUp = (e) => {
     e.preventDefault();
-    const { username, displayname, password } = values;
+    const { username, displayname, password } = state;
     const body = { username, displayname, password };
-    setValues({ ...values, pendingApiCall: true });
     signUp(body)
-      .then((response) => {
-        setValues({ ...values, pendingApiCall: false });
-      })
+      .then((response) => {})
       .catch((error) => {
         console.log(error.response.data.validationErrors);
         if (Object.keys(error).length > 0) {
-          setValues({
-            ...values,
-            pendingApiCall: false,
+          setstate({
+            ...state,
             errors: {
-              ...values.errors,
+              ...state.errors,
               username: error.response.data.validationErrors.username,
               displayname: error.response.data.validationErrors.displayname,
               password: error.response.data.validationErrors.password,
@@ -89,75 +88,70 @@ export const UserSignupPage = () => {
       });
   };
   return (
-    <form onSubmit={onSignUp}>
-      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-        <Container maxWidth="sm">
+    <React.Fragment>
+      <form onSubmit={onSignUp}>
+        <Box sx={{ display: "flex", flexWrap: "wrap" }}>
           <Container maxWidth="sm">
-            <XInput
-              label="User Name"
-              value={values.username}
-              error={values.errors.username}
-              onChange={handleChange("username")}
-            />
-          </Container>
-          <Container maxWidth="sm">
-            <XInput
-              label="Display Name"
-              value={values.displayname}
-              error={values.errors.displayname}
-              onChange={handleChange("displayname")}
-            />
-          </Container>
+            <Container maxWidth="sm">
+              <XInput
+                label={t("Username")}
+                value={state.username}
+                error={state.errors.username}
+                onChange={handleChange("username")}
+              />
+            </Container>
+            <Container maxWidth="sm">
+              <XInput
+                label={t("Display Name")}
+                value={state.displayname}
+                error={state.errors.displayname}
+                onChange={handleChange("displayname")}
+              />
+            </Container>
 
-          <Container maxWidth="sm">
-            <XInputPassword
-              type={values.showPassword}
-              label="Password"
-              error={values.errors.password}
-              value={values.password}
-              onChange={handleChange("password")}
-              onMouseDown={handleMouseDownPassword}
-              onClick={handleClickShowPassword("password")}
-            />
-          </Container>
+            <Container maxWidth="sm">
+              <XInputPassword
+                type={state.showPassword}
+                label={t("Password")}
+                error={state.errors.password}
+                value={state.password}
+                onChange={handleChange("password")}
+                onMouseDown={handleMouseDownPassword}
+                onClick={handleClickShowPassword("password")}
+              />
+            </Container>
 
-          <Container maxWidth="sm">
-            <XInputPassword
-              type={values.showPassword}
-              label="Password Repeat"
-              error={values.errors.passwordRepeat}
-              value={values.passwordRepeat}
-              onChange={handleChange("passwordRepeat")}
-              onMouseDown={handleMouseDownPassword}
-              onClick={handleClickShowPassword("passwordRepeat")}
-            />
-          </Container>
+            <Container maxWidth="sm">
+              <XInputPassword
+                type={state.showPassword}
+                label={t("Password Repeat")}
+                error={state.errors.passwordRepeat}
+                value={state.passwordRepeat}
+                onChange={handleChange("passwordRepeat")}
+                onMouseDown={handleMouseDownPassword}
+                onClick={handleClickShowPassword("passwordRepeat")}
+              />
+            </Container>
 
-          <Container maxWidth="sm">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={
-                values.pendingApiCall ||
-                values.errors.passwordRepeat 
-              }
-            >
-              {values.pendingApiCall && (
-                <span className="spinner-border spinner-border-sm"></span>
-              )}
-              <span
-                style={{
-                  paddingLeft: values.pendingApiCall && "16px",
-                  paddingRight: values.pendingApiCall && "16px",
-                }}
-              >
-                Sign up
-              </span>
-            </Button>
+            <Container maxWidth="sm">
+              <XButton
+                type="submit"
+                variant="contained"
+                color="primary"
+                text = {t("Sign Up")}
+                disabled={pendingApiCall}
+                pendingApiCall = {pendingApiCall}
+              />
+            </Container>
+
+            <Container maxWidth="sm">
+              <LanguageSelector />
+            </Container>
           </Container>
-        </Container>
-      </Box>
-    </form>
+        </Box>
+      </form>
+    </React.Fragment>
   );
 };
+
+export default withApiProgress(UserSignupPage, "api/1.0/users");
